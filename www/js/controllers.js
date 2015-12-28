@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('myStockMarket.controllers', []) // No dependency injections
 
 .controller('AppCtrl', function($scope, $ionicModal, $timeout) {
 
@@ -39,18 +39,83 @@ angular.module('starter.controllers', [])
       $scope.closeLogin();
     }, 1000);
   };
+
 })
 
-.controller('PlaylistsCtrl', function($scope) {
-  $scope.playlists = [
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
-})
+.controller('myStocksCtrl', [ '$scope',
+   function($scope) {
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
-});
+  $scope.myStocksArray = [
+    {ticker: "AAPL"},
+    {ticker: "GPRO"},
+    {ticker: "FB"},
+    {ticker: "NFLX"},
+    {ticker: "TSLA"},
+    {ticker: "BRK-A"},
+    {ticker: "INTC"},
+    {ticker: "MSFT "},
+    {ticker: "GE"},
+    {ticker: "BAC"},
+    {ticker: "C"},
+    {ticker: "T"}
+    ];
+
+
+}])
+
+.controller('stockCtrl', ['$scope', '$stateParams', 'stockDataService', 'dateService',
+ function($scope, $stateParams, stockDataService, dateService) {
+
+
+    $scope.ticker = $stateParams.stockTicker;
+    $scope.chartView = 1;
+
+    console.log( dateService.currentDate() );
+    console.log( dateService.oneYearAgoDate() );
+
+
+    // Call the "getPriceData" & "getDetailsData" Functions
+    // in the event that the scope is entered
+    $scope.$on("$ionicView.afterEnter", function() {
+       getPriceData();
+       getDetailsData();
+    });
+
+
+    // Create the function that changes the Chart view
+    $scope.chartViewFunction = function(n) {
+       $scope.chartView = n;
+    };
+
+
+    // Instantiate function to getPriceData from Yahoo API
+    // Call it from "stockDataServices"
+    function getPriceData(){
+
+       var promise = stockDataService.getPriceData( $scope.ticker );
+       promise.then( function( data ){
+          console.log(data);
+          $scope.stockPriceData = data;
+       });
+    }
+
+    // Instantiate function to getPriceData from Yahoo API
+    // Call it from "stockDataServices"
+    function getDetailsData(){
+
+       var promise = stockDataService.getDetailsData( $scope.ticker );
+       promise.then( function( data ){
+          console.log(data);
+          $scope.stockDetailsData = data;
+       });
+    }
+
+
+}]);
+
+
+
+
+
+
+//
